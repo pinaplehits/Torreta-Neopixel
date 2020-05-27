@@ -22,9 +22,10 @@ const int colorPin[] = {5, 6, 7, 8};
 const int flashColor[] = {1, 2, 3, 6, 7, 9};
 const int sizeColorPin = sizeof(colorPin) / sizeof(colorPin[0]);
 const int rowsRGBColorLeds = sizeof(RGBColorLeds) / sizeof(RGBColorLeds[0]);
+const int delayFlash = 400;
 
 int i;
-int currentColor = 0;
+int currentColor;
 int contador;
 int acumulador;
 
@@ -35,10 +36,10 @@ void setup()
   Serial.println("Torreta Version 1.0");
   Serial.println("El pin 9 es el pin de datos");
   Serial.println("Selector de colores por pines: 5, 6, 7, 8");
-  Serial.println("9 colores disponibles: rojo, verde, azul, morado, verde-azul, amarillo, blanco, rosa, naranja");
-  Serial.println("6 colores con flash: rojo, verde, azul, amarillo, blanco, naranja");
+  Serial.println("9 colores disponibles rojo [PIN 5], verde [PIN 6], azul [PIN 5+6], morado [PIN 7], verde-azul [PIN 5+7], amarillo [PIN 6+7], blanco[PIN 5+6+7], rosa [PIN 8], naranja [PIN 5+8]");
+  Serial.println("6 colores con flash disponibles rojo [PIN 5], verde [PIN 6], azul [PIN 5+6], amarillo [PIN 6+7], blanco[PIN 5+6+7], naranja [PIN 5+8]");
   pixels.begin();
-  pixels.setBrightness(255);
+  pixels.setBrightness(128);
 
   for (i = 0; i < NUMPIXELS; i++)
   {
@@ -103,15 +104,16 @@ void loop()
     for (i = 0; i < NUMPIXELS; i++)
     {
       pixels.setPixelColor(i, RGBColorLeds[currentColor][0], RGBColorLeds[currentColor][1], RGBColorLeds[currentColor][2]);
-      pixels.show();
     }
 
-    delay(400);
+    pixels.show();
+
+    delay(delayFlash);
 
     pixels.clear();
     pixels.show();
 
-    delay(400);
+    delay(delayFlash);
   }
 
   currentColor = 0;
