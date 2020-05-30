@@ -26,8 +26,6 @@ const int delayFlash = 400;
 
 int i;
 int currentColor;
-int contador;
-int acumulador;
 
 void setup()
 {
@@ -38,6 +36,7 @@ void setup()
   Serial.println("Selector de colores por pines: 5, 6, 7, 8");
   Serial.println("9 colores disponibles rojo [PIN 5], verde [PIN 6], azul [PIN 5+6], morado [PIN 7], verde-azul [PIN 5+7], amarillo [PIN 6+7], blanco[PIN 5+6+7], rosa [PIN 8], naranja [PIN 5+8]");
   Serial.println("6 colores con flash disponibles rojo [PIN 5], verde [PIN 6], azul [PIN 5+6], amarillo [PIN 6+7], blanco[PIN 5+6+7], naranja [PIN 5+8]");
+
   pixels.begin();
   pixels.setBrightness(128);
 
@@ -59,62 +58,52 @@ void setup()
 
 void loop()
 {
-  //COLOR SELECTOR BY PIN
-  if (digitalRead(colorPin[0]) == LOW)
-  {
-    acumulador = pow(2, 0);
-    currentColor += acumulador;
-    acumulador = 0;
-  }
-
-  if (digitalRead(colorPin[1]) == LOW)
-  {
-    acumulador = pow(2, 1);
-    currentColor += acumulador;
-    acumulador = 0;
-  }
-
-  if (digitalRead(colorPin[2]) == LOW)
-  {
-    acumulador = pow(2, 2);
-    currentColor += acumulador;
-    acumulador = 0;
-  }
-
-  if (digitalRead(colorPin[3]) == LOW)
-  {
-    acumulador = pow(2, 3);
-    currentColor += acumulador;
-    acumulador = 0;
-  }
+  SelectPixelColor();
 
   if (currentColor < rowsRGBColorLeds)
   {
-    for (i = 0; i < NUMPIXELS; i++)
-    {
-      pixels.setPixelColor(i, RGBColorLeds[currentColor][0], RGBColorLeds[currentColor][1], RGBColorLeds[currentColor][2]);
-      pixels.show();
-    }
+    TurnOnPixel();
   }
   else
   {
-    currentColor -= rowsRGBColorLeds;
-    currentColor = flashColor[currentColor];
+    FlashPixel();
+  }
 
-    for (i = 0; i < NUMPIXELS; i++)
+  currentColor = 0;
+}
+
+void SelectPixelColor()
+{
+  for (i = 0; i < sizeColorPin; i++)
+  {
+    if (digitalRead(colorPin[i]) == LOW)
+    {
+      currentColor += bit(i);
+    }
+  }
+}
+
+void TurnOnPixel()
+{
+  for (i = 0; i < NUMPIXELS; i++)
     {
       pixels.setPixelColor(i, RGBColorLeds[currentColor][0], RGBColorLeds[currentColor][1], RGBColorLeds[currentColor][2]);
     }
 
     pixels.show();
+}
 
-    delay(delayFlash);
+void FlashPixel()
+{
+  currentColor -= rowsRGBColorLeds;
+  currentColor = flashColor[currentColor];
 
-    pixels.clear();
-    pixels.show();
+  TurnOnPixel();
 
-    delay(delayFlash);
-  }
+  delay(delayFlash);
 
-  currentColor = 0;
+  pixels.clear();
+  pixels.show();
+
+  delay(delayFlash);
 }
